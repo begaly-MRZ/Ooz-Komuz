@@ -1,0 +1,498 @@
+
+<!DOCTYPE html>
+<html lang="ky">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Темир жана жыгач ооз комуз</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#071b17;
+  --panel:#102b24;
+  --gold:#d9b56d;
+  --cream:#f4ead4;
+  --muted:#c4c7ad;
+  --green:#8caa78;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);
+  color:var(--cream);
+  font-family:'Montserrat',sans-serif;
+  overflow:hidden;
+}
+body:before{
+  content:"";
+  position:fixed;inset:0;
+  background:
+    radial-gradient(circle at 15% 20%,#315b392b,transparent 30%),
+    radial-gradient(circle at 85% 80%,#b88b3920,transparent 30%);
+  pointer-events:none;
+}
+.deck{height:100vh;width:100%;position:relative}
+.slide{
+  position:absolute;inset:0;
+  padding:65px 9% 95px;
+  display:flex;align-items:center;justify-content:center;
+  overflow-y:auto;
+  opacity:0;visibility:hidden;
+  transform:translateY(25px) scale(.98);
+  transition:opacity .65s ease,transform .65s ease,visibility .65s;
+}
+.slide.active{
+  opacity:1;visibility:visible;
+  transform:translateY(0) scale(1);
+  z-index:2;
+}
+.content{width:min(1050px,100%);position:relative}
+.kicker{
+  color:var(--gold);font-size:12px;letter-spacing:4px;
+  text-transform:uppercase;margin-bottom:18px;font-weight:700;
+}
+h1,h2,h3,.hand{font-family:'Caveat',cursive}
+h1{font-size:clamp(65px,10vw,125px);line-height:.9;color:var(--gold)}
+h2{font-size:clamp(43px,6vw,70px);line-height:1.05;color:var(--gold);margin-bottom:25px}
+h3{font-size:32px;color:var(--gold);margin-bottom:10px}
+p{font-size:15px;line-height:1.9;color:var(--cream);margin:0 0 15px}
+.subtitle{font-size:18px;color:var(--muted);margin-top:24px;max-width:650px}
+.line{
+  width:95px;height:3px;background:var(--gold);
+  margin:24px 0;border-radius:10px;
+}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:25px;align-items:center}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.panel{
+  background:linear-gradient(145deg,#18372d,#0d241e);
+  border:1px solid #d9b56d42;border-radius:20px;
+  padding:24px;box-shadow:0 15px 40px #0003;
+}
+.panel p{font-size:14px}
+.tag{
+  display:inline-block;border:1px solid #d9b56d80;
+  color:var(--gold);padding:8px 14px;border-radius:30px;
+  font-size:11px;letter-spacing:1px;margin:5px 5px 5px 0;
+}
+.big-number{font-size:42px;color:var(--gold);font-family:'Caveat'}
+.image-box{
+  position:relative;width:100%;min-height:230px;
+  border:2px dashed #d9b56d99;border-radius:18px;
+  background:linear-gradient(135deg,#203e31,#10251e);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  text-align:center;padding:15px;
+}
+.image-box img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;display:none;
+}
+.image-box.has-image img{display:block}
+.image-box.has-image .placeholder{display:none}
+.placeholder{color:var(--gold);position:relative;z-index:1}
+.placeholder span{font-size:38px;display:block;margin-bottom:10px}
+.placeholder strong{display:block;font-size:14px}
+.placeholder small{display:block;color:var(--muted);margin-top:8px;font-size:11px}
+.list{padding-left:20px}
+.list li{color:var(--cream);font-size:14px;line-height:1.8;margin-bottom:9px}
+.quote{
+  border-left:3px solid var(--gold);padding:14px 20px;
+  color:var(--muted);font-family:'Caveat';font-size:27px;
+  margin-top:18px;
+}
+.decor{
+  position:absolute;right:0;top:0;
+  width:130px;height:130px;border:1px solid #d9b56d55;
+  border-radius:50%;opacity:.5;
+}
+.decor:before,.decor:after{
+  content:"";position:absolute;inset:14px;border:1px solid var(--gold);
+  border-radius:50%;transform:rotate(45deg) scaleX(.5);
+}
+.decor:after{transform:rotate(-45deg) scaleX(.5)}
+.controls{
+  position:fixed;bottom:22px;left:0;right:0;
+  display:flex;align-items:center;justify-content:center;
+  gap:18px;z-index:20;
+}
+.ctrl{
+  background:#17352a;border:1px solid #d9b56d88;
+  color:var(--gold);width:43px;height:43px;border-radius:50%;
+  font-size:20px;cursor:pointer;transition:.25s;
+}
+.ctrl:hover{background:var(--gold);color:#10251e;transform:scale(1.08)}
+.counter{font-size:12px;color:var(--muted);min-width:55px;text-align:center}
+.progress{
+  position:fixed;top:0;left:0;height:4px;background:var(--gold);
+  width:12.5%;z-index:30;transition:width .5s;
+}
+.dots{
+  position:fixed;right:22px;top:50%;transform:translateY(-50%);
+  display:flex;flex-direction:column;gap:10px;z-index:20;
+}
+.dot{
+  width:7px;height:7px;border-radius:50%;background:#8caa78;
+  opacity:.35;cursor:pointer;transition:.3s;
+}
+.dot.active{opacity:1;background:var(--gold);transform:scale(1.6)}
+.slide.active .content>*{
+  animation:appear .7s both;
+}
+.slide.active .content>*:nth-child(2){animation-delay:.08s}
+.slide.active .content>*:nth-child(3){animation-delay:.16s}
+.slide.active .content>*:nth-child(4){animation-delay:.24s}
+.slide.active .content>*:nth-child(5){animation-delay:.32s}
+@keyframes appear{
+  from{opacity:0;transform:translateY(22px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.float{animation:float 4s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-12px)}}
+.glow{text-shadow:0 0 25px #d9b56d55}
+.footer-note{
+  color:#aab49b;font-size:11px;margin-top:20px;letter-spacing:1px
+}
+@media(max-width:750px){
+  .slide{padding:45px 6% 90px;align-items:flex-start}
+  .content{margin:auto 0}
+  .grid2,.grid3{grid-template-columns:1fr}
+  .decor{width:75px;height:75px;opacity:.25}
+  p{font-size:13px;line-height:1.75}
+  h2{font-size:47px}
+  .image-box{min-height:190px}
+  .dots{right:9px;gap:8px}
+  .dot{width:6px;height:6px}
+}
+</style>
+</head>
+
+<body>
+<div class="progress" id="progress"></div>
+<div class="deck">
+
+<!-- 1-СЛАЙД -->
+<section class="slide active">
+<div class="content">
+  <div class="decor float"></div>
+  <div class="kicker">Кыргыз элинин улуттук музыкалык мурасы</div>
+  <h1 class="glow">Ооз комуз</h1>
+  <h2 style="font-size:clamp(32px,5vw,55px);color:var(--cream);margin-top:10px">
+    Темир жана жыгач түрлөрү
+  </h2>
+  <div class="line"></div>
+  <p class="subtitle">
+    Кыргыз элинин байыркы музыкалык аспаптары, алардын
+    түзүлүшү, үн өзгөчөлүгү жана маданияттагы орду.
+  </p>
+  <div style="margin-top:30px">
+    <span class="tag">УЛУТТУК МУРАС</span>
+    <span class="tag">МУЗЫКА</span>
+    <span class="tag">САЛТ-САНАА</span>
+  </div>
+  <p class="footer-note">ДАЯРДАГАН: Эгемова Сумая</p>
+</div>
+</section>
+
+<!-- 2-СЛАЙД -->
+<section class="slide">
+<div class="content">
+  <div class="kicker">01 / Киришүү</div>
+  <h2>Ооз комуз деген эмне?</h2>
+  <div class="grid2">
+    <div>
+      <p>
+        Ооз комуз — кыргыз элинин байыркы жана өзгөчө музыкалык
+        аспаптарынын бири. Ал ооз көңдөйүнүн жардамы менен үн
+        чыгаруучу аспап болуп эсептелет. Аспаптын үнү аткаруучунун
+        дем алуусуна, ооз көңдөйүнүн кыймылына жана тилчесинин
+        термелишине байланыштуу.
+      </p>
+      <p>
+        Ооз комуздун темирден жана жыгачтан жасалган түрлөрү
+        кездешет. Алар материалы, жасалышы жана үнүнүн мүнөзү
+        боюнча айырмаланышы мүмкүн. Бул аспап элдик музыкада,
+        салттуу оюн-зооктордо жана маданий иш-чараларда маанилүү
+        орунду ээлейт.
+      </p>
+      <div class="quote">«Ар бир улуттук аспап — элдин тарыхын жана жан дүйнөсүн чагылдырган мурас»</div>
+    </div>
+    <div class="image-box">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ8MHWjhtuAME3suH-dY5ml95_DRPOfEGtKLUw9ugDnAw&s=10" alt="Кыргыздын ооз комузу">
+      <div class="placeholder">
+        <span>📷</span>
+        <strong>Ооз комуздун жалпы сүрөтү</strong>
+        <small>IMAGE_URL_1 ордуна сүрөт шилтемесин кой</small>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 3-СЛАЙД -->
+<section class="slide">
+<div class="content">
+  <div class="kicker">02 / Теманын актуалдуулугу</div>
+  <h2>Эмне үчүн бул тема маанилүү?</h2>
+  <p>
+    Азыркы заманда улуттук маданиятты сактоо жана кийинки
+    муундарга жеткирүү өтө маанилүү. Жаштар дүйнөлүк музыка
+    менен катар өз элинин музыкалык мурастарын да билиши керек.
+    Ооз комузду үйрөнүү аркылуу кыргыз элинин чыгармачылыгын,
+    салтын жана тарыхын тереңирээк түшүнө алабыз.
+  </p>
+  <div class="grid3">
+    <div class="panel">
+      <div class="big-number">01</div>
+      <h3>Мурасты сактоо</h3>
+      <p>Улуттук аспаптарды таанып-билүү жана алардын унутулуп калбашына салым кошуу.</p>
+    </div>
+    <div class="panel">
+      <div class="big-number">02</div>
+      <h3>Жаштарга таанытуу</h3>
+      <p>Ооз комуздун өзгөчөлүгүн мектептерде жана маданий иш-чараларда жайылтуу.</p>
+    </div>
+    <div class="panel">
+      <div class="big-number">03</div>
+      <h3>Өнүктүрүү</h3>
+      <p>Салттуу аспаптарды заманбап музыка жана жаңы чыгармачылык менен айкалыштыруу.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 4-СЛАЙД -->
+<section class="slide">
+<div class="content">
+  <div class="kicker">03 / Максаты жана милдеттери</div>
+  <h2>Изилдөөнүн максаты</h2>
+  <div class="panel" style="margin-bottom:20px">
+    <h3>Негизги максат</h3>
+    <p>
+      Темир жана жыгач ооз комуздун өзгөчөлүктөрүн үйрөнүү,
+      алардын түзүлүшүн жана үн чыгаруу жолдорун салыштыруу,
+      ошондой эле кыргыз маданиятындагы маанисин түшүндүрүү.
+    </p>
+  </div>
+  <div class="grid2">
+    <div>
+      <h3>Милдеттери</h3>
+      <ul class="list">
+        <li>Ооз комуздун тарыхы жөнүндө маалымат алуу.</li>
+        <li>Темир ооз комуздун түзүлүшүн изилдөө.</li>
+        <li>Жыгач ооз комуздун жасалышын жана өзгөчөлүгүн кароо.</li>
+        <li>Эки түрүнүн окшоштуктарын жана айырмачылыктарын салыштыруу.</li>
+        <li>Аспапты сактоо жана өнүктүрүү жолдорун сунуштоо.</li>
+      </ul>
+    </div>
+    <div class="image-box">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8TyYjXwYl8WyrncK5azBinObqdUVJKLWjoT81-0GB9Q&s" alt="Ооз комузда ойноп жаткан адам">
+      <div class="placeholder">
+        <span>📷</span>
+        <strong>Ооз комуз аткаруучусу</strong>
+        <small>IMAGE_URL_2 ордуна сүрөт шилтемесин кой</small>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 5-СЛАЙД -->
+<section class="slide">
+<div class="content">
+  <div class="kicker">04 / Биринчи түрү</div>
+  <h2>Темир ооз комуз</h2>
+  <div class="grid2">
+    <div class="image-box">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSqYjh9VbCHMihcp0u6_CvtI6CorX-HRhsGd593o9FXxl1AHnDyU6ywRrBd&s=10" alt="Темир ооз комуз">
+      <div class="placeholder">
+        <span>📷</span>
+        <strong>Темир ооз комуздун сүрөтү</strong>
+        <small>IMAGE_URL_3 ордуна сүрөт шилтемесин кой</small>
+      </div>
+    </div>
+    <div>
+      <p>
+        Темир ооз комуз — металлдан жасалган ооз комуздун түрү.
+        Анын негизги бөлүгү алкак жана ортосунда жайгашкан ийилчээк
+        тилче болуп саналат. Тилчени кыймылга келтиргенде үн пайда
+        болот, ал эми аткаруучунун ооз көңдөйү үндүн тембрин жана
+        бийиктигин өзгөртүүгө жардам берет.
+      </p>
+      <p>
+        Темир ооз комуздун көлөмү чакан болгондуктан, аны алып
+        жүрүү ыңгайлуу. Аспаптын үнү өзгөчө жаңырып, ритмдүү
+        обондорду аткарууга мүмкүнчүлүк берет. Аны жасоодо
+        металлдын сапатына жана тилченин ийкемдүүлүгүнө көңүл
+        бурулат.
+      </p>
+      <span class="tag">МЕТАЛЛ</span>
+      <span class="tag">ИЙКЕМЧЭЭК ТИЛЧЕ</span>
+      <span class="tag">ӨЗГӨЧӨ ҮН</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 6-СЛАЙД -->
+<section class="slide">
+<div class="content">
+  <div class="kicker">05 / Экинчи түрү</div>
+  <h2>Жыгач ооз комуз</h2>
+  <div class="grid2">
+    <div>
+      <p>
+        Жыгач ооз комуз — жыгач материалынан жасалган ооз комуздун
+        түрү. Анын формасы, өлчөмү жана үн чыгаруу өзгөчөлүгү
+        колдонулган жыгачка жана устачылык ыкмасына жараша
+        өзгөрүшү мүмкүн.
+      </p>
+      <p>
+        Жыгачтан жасалган аспапты даярдоодо жыгачтын бекемдиги,
+        сапаты жана иштетилиши эске алынат. Мындай аспаптар
+        элдик устачылык өнөрдүн жана музыкалык чыгармачылыктын
+        байланышын көрсөтөт.
+      </p>
+      <p>
+        Жыгач ооз комузду темир түрү менен салыштыруу анын
+        жасалышын, материалынын маанисин жана үн өзгөчөлүктөрүн
+        жакшыраак түшүнүүгө жардам берет.
+      </p>
+      <span class="tag">ЖЫГАЧ</span>
+      <span class="tag">УСТАЧЫЛЫК ӨНӨР</span>
+      <span class="tag">ЭЛДИК МУЗЫКА</span>
+    </div>
+    <div class="image-box">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR9E-Pj6ZvdoCnqcq0X90sfu3QbuAv2pCiQjkYboctIcw&s=10" alt="Жыгач ооз комуз">
+      <div class="placeholder">
+        <span>📷</span>
+        <strong>Жыгач ооз комуздун сүрөтү</strong>
+        <small>IMAGE_URL_4 ордуна сүрөт шилтемесин кой</small>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 7-СЛАЙД -->
+<section class="slide">
+<div class="content">
+  <div class="kicker">06 / Салыштыруу жана жаңы идеялар</div>
+  <h2>Эки түрүнүн айырмасы</h2>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Темир ооз комуз</h3>
+      <ul class="list">
+        <li>Негизинен металлдан жасалат.</li>
+        <li>Алкагы жана ийилчээк тилчеси болот.</li>
+        <li>Тилченин термелиши аркылуу үн чыгарат.</li>
+        <li>Металлдын түрү жана жасалышы үнүнө таасир берет.</li>
+      </ul>
+    </div>
+    <div class="panel">
+      <h3>Жыгач ооз комуз</h3>
+      <ul class="list">
+        <li>Жыгач материалынан жасалат.</li>
+        <li>Түзүлүшү жыгачты иштетүү ыкмасына жараша болот.</li>
+        <li>Үнү аспаптын формасына жана жасалышына байланыштуу.</li>
+        <li>Жыгач устачылыгы менен музыканы айкалыштырат.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="panel" style="margin-top:20px">
+    <h3>Келечекке жаңы идеялар</h3>
+    <p>
+      Ооз комуздун эки түрүн тең мектептерде таанытуу, аспаптар
+      жөнүндө кыска видеолорду даярдоо, усталар менен жолугушууларды
+      уюштуруу жана заманбап музыкалык чыгармаларда колдонуу —
+      улуттук мурасты өнүктүрүүнүн жакшы жолдору.
+    </p>
+  </div>
+</div>
+</section>
+
+<!-- 8-СЛАЙД -->
+<section class="slide">
+<div class="content">
+  <div class="kicker">07 / Жыйынтык</div>
+  <h2>Улуттук мурас — биздин байлыгыбыз</h2>
+  <p>
+    Жыйынтыктап айтканда, темир жана жыгач ооз комуз кыргыз
+    элинин музыкалык маданиятын таанып-билүүгө жардам берген
+    аспаптардын түрлөрү болуп саналат. Алар жасалган материалы,
+    түзүлүшү жана үн чыгаруу өзгөчөлүктөрү боюнча айырмаланат.
+  </p>
+  <p>
+    Бул аспаптарды изилдөө аркылуу биз ата-бабаларыбыздын
+    чыгармачылыгын, устачылык өнөрүн жана музыкалык дүйнөсүн
+    жакшыраак түшүнөбүз. Улуттук аспаптарды сактоо, үйрөнүү
+    жана жаш муундарга жеткирүү — ар бирибиздин милдетибиз.
+  </p>
+  <div class="line"></div>
+  <h1 style="font-size:clamp(65px,10vw,105px)">Рахмат!</h1>
+  <p class="subtitle">Көңүл бурганыңыздар үчүн чоң рахмат!</p>
+  <div style="margin-top:20px">
+    <span class="tag">ТАРЫХ</span>
+    <span class="tag">МАДАНИЯТ</span>
+    <span class="tag">МУРАС</span>
+  </div>
+</div>
+</section>
+
+</div>
+
+<div class="dots" id="dots"></div>
+<div class="controls">
+  <button class="ctrl" id="prev" aria-label="Мурунку слайд">‹</button>
+  <div class="counter" id="counter">01 / 08</div>
+  <button class="ctrl" id="next" aria-label="Кийинки слайд">›</button>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];
+const dotsBox=document.getElementById('dots');
+const counter=document.getElementById('counter');
+const progress=document.getElementById('progress');
+let current=0;
+
+slides.forEach((_,i)=>{
+  const dot=document.createElement('div');
+  dot.className='dot'+(i===0?' active':'');
+  dot.title='Слайд '+(i+1);
+  dot.addEventListener('click',()=>showSlide(i));
+  dotsBox.appendChild(dot);
+});
+const dots=[...document.querySelectorAll('.dot')];
+
+function showSlide(index){
+  current=Math.max(0,Math.min(index,slides.length-1));
+  slides.forEach((s,i)=>s.classList.toggle('active',i===current));
+  dots.forEach((d,i)=>d.classList.toggle('active',i===current));
+  counter.textContent=String(current+1).padStart(2,'0')+' / '+String(slides.length).padStart(2,'0');
+  progress.style.width=((current+1)/slides.length*100)+'%';
+}
+document.getElementById('next').addEventListener('click',()=>showSlide(current+1));
+document.getElementById('prev').addEventListener('click',()=>showSlide(current-1));
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' ')showSlide(current+1);
+  if(e.key==='ArrowLeft')showSlide(current-1);
+});
+
+let startX=0;
+document.addEventListener('touchstart',e=>{startX=e.changedTouches[0].screenX},{passive:true});
+document.addEventListener('touchend',e=>{
+  const dx=e.changedTouches[0].screenX-startX;
+  if(Math.abs(dx)>60)showSlide(current+(dx<0?1:-1));
+},{passive:true});
+
+// Сүрөт жүктөлсө, анын ордуна бош орун эмес, сүрөт көрсөтүлөт.
+document.querySelectorAll('.image-box img').forEach(img=>{
+  img.addEventListener('load',()=>img.parentElement.classList.add('has-image'));
+  img.addEventListener('error',()=>img.parentElement.classList.remove('has-image'));
+  if(img.complete && img.naturalWidth>0)img.parentElement.classList.add('has-image');
+});
+</script>
+</body>
+</html>
